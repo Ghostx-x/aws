@@ -1,14 +1,36 @@
-service: hello-world
+service: uploadFile
 
 provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-1
+  environment:
+    BUCKET_NAME:
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+          Resource: "arn:aws:s3:::file-upload-bucket-natali-2025/*"
 
 functions:
-  helloWorld:
-    handler: handler.helloWorld
+  uploadFile:
+    handler: handler.uploadFile
     events:
         - http:
-            path: helloWorld
-            method: get
+            path: uploadFile
+            method: post
+            cors: true
+
+resources:
+  Resources:
+    UploadBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: file-upload-bucket-natali-2025
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods: ['GET', 'PUT', 'POST']
+              AllowedHeaders: ['*']
+              AllowedOrigins: ['*']
